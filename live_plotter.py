@@ -2,20 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-def animate(i, bitalino, ax, ys, channel, nSamples):
-    data = bitalino.read(nSamples)[:, channel]
-    print(data)
-    for d in data:
-        ys.append(d)
+class live_plotter:
+    def animate(self, i):
+        self.data = np.append(self.data, self.bitalino.read(self.nSamples), axis=0)
+        print(self.data.shape)
+        self.ax.clear()
+        for channel in self.channels:
+            print(channel, self.data[:, channel].shape)
+            self.ax.plot(self.data[:, channel])
 
-    ax.clear()
-    ax.plot(ys)
+    def __init__(self, bitalino, channels, nSamples):
+        self.bitalino = bitalino
+        self.channels = channels
+        self.nSamples = nSamples
+        self.data = bitalino.read(self.nSamples)
 
-def live_plotter(bitalino, channel, nSamples):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ys = []
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(1, 1, 1)
 
-    ani = animation.FuncAnimation(fig, animate, fargs=(bitalino, ax, ys, channel, nSamples), interval=1000)
-    plt.show()
+        ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
+        plt.show()
 
