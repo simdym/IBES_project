@@ -5,10 +5,8 @@ import matplotlib.animation as animation
 class live_plotter:
     def animate(self, i):
         self.data = np.append(self.data, self.bitalino.read(self.nSamples), axis=0)
-        print(self.data.shape)
         self.ax.clear()
         for channel in self.channels:
-            print(channel, self.data[:, channel].shape)
             self.ax.plot(self.data[:, channel])
 
     def __init__(self, bitalino, channels, nSamples):
@@ -22,4 +20,3 @@ class live_plotter:
 
         ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
         plt.show()
-
