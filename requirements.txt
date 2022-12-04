@@ -1,3 +1,6 @@
-bitalino
-matplotlib
-scipy
+bitalino~=1.2.6
+matplotlib~=3.6.1
+scipy~=1.9.3
+py-ecg-detectors
+hrv
+numpy~=1.23.4
