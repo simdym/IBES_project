@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-
-import heartpy_impl as hp
-import ecg_detector_impl as ed
 import neurokit2_impl as nk
 
 def flip_signal(signal):

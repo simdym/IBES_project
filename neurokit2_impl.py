@@ -53,5 +53,5 @@ def get_blood_pressure(ecg_data, ppg_data, sample_rate):
     blood_pressure = 0 #f(ptt) TODO implement blood pressure function
     # (PS: use numpy functions as ptt is a numpy.array)
 
-    # Can use
+    # I would prefer that blood_pressure is an np.array of same size as ptt
     return blood_pressure
