@@ -7,34 +7,40 @@ import neurokit2 as nk
 """
 
 def ecg_preprocess(data, sample_rate):
+    data -= np.mean(data)
     return nk.ecg_clean(data, sampling_rate=sample_rate, method="neurokit")
 
 
 def ppg_preprocess(data, sample_rate):
+    data -= np.mean(data)
     return nk.ppg_clean(data, sampling_rate=sample_rate, method='elgendi')
 
 
 def get_ecg_peaks(data, sample_rate):
     data_proccesed = ecg_preprocess(data, sample_rate)
-    rpeaks = nk.ecg_findpeaks(data, sampling_rate=sample_rate)['ECG_R_Peaks']
+    rpeaks = nk.ecg_findpeaks(data_proccesed, sampling_rate=sample_rate)['ECG_R_Peaks']
 
     return rpeaks
 
 
 def get_ppg_peaks(data, sample_rate):
     data_proccesed = ppg_preprocess(data, sample_rate)
-    speaks = nk.ppg_findpeaks(data, sampling_rate=sample_rate)['PPG_Peaks']
+    speaks = nk.ppg_findpeaks(data_proccesed, sampling_rate=sample_rate)['PPG_Peaks']
 
     return speaks
 
 def get_ptt(ecg_peaks, ppg_peaks):
     ppt = []
-    for ecg_peak in ecg_peaks:
-        ppg_peak = ppg_peaks[ppg_peaks > ecg_peak]
-        if(len(ppg_peak) > 0):
+    for i in range(len(ecg_peaks)):
+        ppg_peak = ppg_peaks[ppg_peaks > ecg_peaks[i]]  # Finds next ppg_peak
+        if len(ppg_peak) > 0:
             ppg_peak = ppg_peak[0]
-            ppt.append(ppg_peak-ecg_peak)
-
+            if i < len(ecg_peaks) - 1:
+                print(ppg_peak, ecg_peaks[i + 1])
+                if ppg_peak < ecg_peaks[i + 1]:  # Only uses ppg_peak if peak is located before next ecg_peak
+                    ppt.append(ppg_peak-ecg_peaks[i])
+                else:
+                    print("not accepted")
     return ppt
 
 def get_ecg_heartrate(data, sample_rate):
