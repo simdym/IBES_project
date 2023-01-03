@@ -54,9 +54,11 @@ def get_ppg_heartrate(data, sample_rate):
     return sample_rate*60/np.diff(peaks)
 
 def get_blood_pressure(ecg_data, ppg_data, sample_rate):
-    ptt = get_ptt(ecg_data, ppg_data, sample_rate)
+    ecg_peaks = get_ecg_peaks(ecg_data, sample_rate)
+    ppg_peaks = get_ppg_peaks(ppg_data, sample_rate)
+    ptt = get_ptt(ecg_peaks, ppg_peaks)
 
-    blood_pressure = 0 #f(ptt) TODO implement blood pressure function
+    blood_pressure = np.zeros(len(ptt)) #f(ptt) TODO implement blood pressure function
     # (PS: use numpy functions as ptt is a numpy.array)
 
     # I would prefer that blood_pressure is an np.array of same size as ptt
