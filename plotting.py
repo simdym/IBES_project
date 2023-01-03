@@ -99,6 +99,18 @@ def plot_hr():
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f s'))
     ax.legend()
 
+def plot_bp():
+    ecg_peaks = nk.get_ecg_peaks(ecg_data, sample_rate)
+
+    bp = nk.get_blood_pressure(ecg_data, ppg_data, sample_rate)
+
+    fig, ax = plt.subplots()
+
+    ax.plot(ecg_peaks[:len(bp)] / 1000, bp, label="Blood pressure")
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f s'))
+    ax.legend()
+
+
 """
 
 #PPG plotting:
@@ -154,14 +166,14 @@ ax2.legend()"""
 
 plot_ptt()
 plot_hr()
-plt.show()
+plot_bp()
 
 plot_ecg_peaks()
 plot_ppg_peaks()
 plt.show()
 
 plot_ppg_raw()
-#plot_ppg_preprocessed()
+plot_ppg_preprocessed()
 plot_ecg_raw()
 plot_ecg_preprocessed()
 plt.show()
