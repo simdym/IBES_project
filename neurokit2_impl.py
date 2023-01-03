@@ -7,12 +7,12 @@ import neurokit2 as nk
 """
 
 def ecg_preprocess(data, sample_rate):
-    data -= np.mean(data)
+    data = data - np.mean(data)
     return nk.ecg_clean(data, sampling_rate=sample_rate, method="neurokit")
 
 
 def ppg_preprocess(data, sample_rate):
-    data -= np.mean(data)
+    data = data - np.mean(data)
     return nk.ppg_clean(data, sampling_rate=sample_rate, method='elgendi')
 
 
