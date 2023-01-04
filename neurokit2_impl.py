@@ -1,6 +1,6 @@
 import numpy as np
-import pandas as pd
 import neurokit2 as nk
+import ProjectModels as bp  # Blood pressure models
 
 """
     Implementations of functions using the neurokit2 library
@@ -36,11 +36,8 @@ def get_ptt(ecg_peaks, ppg_peaks):
         if len(ppg_peak) > 0:
             ppg_peak = ppg_peak[0]
             if i < len(ecg_peaks) - 1:
-                print(ppg_peak, ecg_peaks[i + 1])
                 if ppg_peak < ecg_peaks[i + 1]:  # Only uses ppg_peak if peak is located before next ecg_peak
                     ppt.append(ppg_peak-ecg_peaks[i])
-                else:
-                    print("not accepted")
     return ppt
 
 def get_ecg_heartrate(data, sample_rate):
@@ -53,13 +50,20 @@ def get_ppg_heartrate(data, sample_rate):
 
     return sample_rate*60/np.diff(peaks)
 
-def get_blood_pressure(ecg_data, ppg_data, sample_rate):
+def get_Geshe_blood_pressure(ecg_data, ppg_data, height, sample_rate):
     ecg_peaks = get_ecg_peaks(ecg_data, sample_rate)
     ppg_peaks = get_ppg_peaks(ppg_data, sample_rate)
     ptt = get_ptt(ecg_peaks, ppg_peaks)
 
-    blood_pressure = np.zeros(len(ptt)) #f(ptt) TODO implement blood pressure function
-    # (PS: use numpy functions as ptt is a numpy.array)
+    blood_pressure = bp.Gesche(0.5, height, ptt)
 
-    # I would prefer that blood_pressure is an np.array of same size as ptt
+    return blood_pressure
+
+def get_MoenAndKorteweg_blood_pressure(ecg_data, ppg_data, height, sample_rate):
+    ecg_peaks = get_ecg_peaks(ecg_data, sample_rate)
+    ppg_peaks = get_ppg_peaks(ppg_data, sample_rate)
+    ptt = get_ptt(ecg_peaks, ppg_peaks)
+
+    blood_pressure = bp.MoenAndKorteweg(height, ptt)
+
     return blood_pressure
