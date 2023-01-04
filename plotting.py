@@ -23,7 +23,25 @@ def plot_peaks(ax, peaks, data, color='red'):
 def gliding_avg(data, len):
     return np.convolve(data, np.ones(len), mode='valid')/len
 
-df = pd.read_csv("titouan_1.csv")
+meas = "titouan_1"
+
+df = pd.read_csv(meas+".csv")
+if meas == "titouan_1":
+    height = 174
+    start_bp = 108
+    end_bp = 111
+    ref_bp = [start_bp, end_bp]
+    start_hr = 73
+    end_hr = 67
+    ref_hr = [start_hr, end_hr]
+elif meas == "simen_1":
+    height = 190
+    start_bp = 124
+    end_bp = 114
+    ref_bp = [start_bp, end_bp]
+    start_hr = 59
+    end_hr = 67
+    ref_hr = [start_hr, end_hr]
 
 ppg_data = df['6']
 ecg_data = df['5']
@@ -94,6 +112,7 @@ def plot_hr():
 
     fig, ax = plt.subplots()
 
+    ax.plot([0, 60], ref_hr, '--', label="Reference meassurment")
     ax.plot(ecg_peaks, ecg_hr, label="ECG heartrate")
     ax.plot(ppg_peaks, ppg_hr, label="PPG heartrate")
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f s'))
@@ -102,74 +121,20 @@ def plot_hr():
 def plot_bp():
     ecg_peaks = nk.get_ecg_peaks(ecg_data, sample_rate)
 
-    bp = nk.get_blood_pressure(ecg_data, ppg_data, sample_rate)
+    Gershe_bp = nk.get_Geshe_blood_pressure(ecg_data, ppg_data, height, sample_rate)
+    MoenAndKorteweg_bp = nk.get_MoenAndKorteweg_blood_pressure(ecg_data, ppg_data, height, sample_rate)
 
     fig, ax = plt.subplots()
 
-    ax.plot(ecg_peaks[:len(bp)] / 1000, bp, label="Blood pressure")
+    ax.plot([0, 60], ref_bp, '--', label="Reference meassurment")
+    ax.plot(ecg_peaks[:len(Gershe_bp)] / 1000, Gershe_bp, label="Gershe")
+    ax.plot(ecg_peaks[:len(MoenAndKorteweg_bp)] / 1000, MoenAndKorteweg_bp, label="Moen and Korteweg")
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f s'))
     ax.legend()
 
-
-"""
-
-#PPG plotting:
-filt_nk_ppg_data = nk.ppg_preprocess(ppg_data, sample_rate=sample_rate)
-nk_ppg_peaks = nk.get_ppg_peaks(ppg_data, sample_rate=sample_rate)
-plot_peaks(ax1, nk_ppg_peaks, filt_nk_ppg_data, 'red')
-
-
-
-
-#ECG plotting:
-filt_nk_ecg_data = nk.ecg_preprocess(ecg_data, sample_rate=sample_rate)
-nk_ecg_peaks = nk.get_ecg_peaks(ecg_data, sample_rate=sample_rate)
-plot_peaks(ax2, nk_ecg_peaks, filt_nk_ecg_data, 'red')
-
-ax2.plot(ecg_data, label='raw')
-ax2.plot(filt_nk_ecg_data, label='nk')
-
-#PTT, heartbeat and blood pressure plotting
-fig3, ax4 = plt.subplots()
-
-avg_len = 10
-avg_nk_ecg_peaks = gliding_avg(np.diff(nk_ecg_peaks), avg_len)
-avg_nk_ppg_peaks = gliding_avg(np.diff(nk_ppg_peaks), avg_len)
-
-ax4.plot(np.diff(nk_ecg_peaks), label='ecg_period')
-ax4.plot(avg_nk_ecg_peaks, label='avg_ecg_period')
-ax4.plot(np.diff(nk_ppg_peaks), label='ppg_period')
-ax4.plot(avg_nk_ppg_peaks, label='avg_ppg_period')
-
-avg_ecg_hr = gliding_avg(nk.get_ecg_heartrate(ecg_data, sample_rate), avg_len)
-avg_ppg_hr = gliding_avg(nk.get_ecg_heartrate(ecg_data, sample_rate), avg_len)
-
-ax4.plot(nk.get_ecg_heartrate(ecg_data, sample_rate), label='ecg_hr')
-ax4.plot(avg_ecg_hr, label='avg_ecg_hr')
-ax4.plot(nk.get_ppg_heartrate(ppg_data, sample_rate), label='ppg_hr')
-ax4.plot(avg_ppg_hr, label='avg_ecg_hr')
-
-ax4.plot(nk.get_ptt(nk_ecg_peaks, nk_ppg_peaks), label='ptt')
-
-
-ax4.legend()
-
-ax4.plot(filt_nk_ppg_data, label='nk')
-plot_peaks(ax4, nk_ecg_peaks, filt_nk_ecg_data, 'orange')
-
-ax4.plot(filt_nk_ecg_data, label='nk')
-plot_peaks(ax4, nk_ppg_peaks, filt_nk_ppg_data, 'darkgreen')
-ax4.legend()
-
-ax1.legend()
-ax2.legend()"""
-
 plot_ptt()
-plot_hr()
 plot_bp()
-
-plot_ecg_peaks()
-plot_ppg_peaks()
+plot_hr()
 plt.show()
 
 plot_ppg_raw()
