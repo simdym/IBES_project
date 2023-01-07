@@ -45,15 +45,44 @@ def get_ecg_heartrate(data, sample_rate):
 
     return sample_rate*60/np.diff(peaks)
 
+def get_mean_ecg_heartrate(data, period, sample_rate):
+    peaks = get_ecg_peaks(data, sample_rate)
+
+    sample_period = int(period * sample_rate)
+    diff_peaks_mean = []
+    for peak in peaks[sample_period < peaks]:
+        peaks_in_period = peaks[peaks <= peak]
+        peaks_in_period = peaks_in_period[(peak - sample_period) < peaks_in_period]
+        diff_peaks_mean.append(np.mean(np.diff(peaks_in_period)))
+    print(diff_peaks_mean)
+    return sample_rate * 60 / np.array(diff_peaks_mean)
+
 def get_ppg_heartrate(data, sample_rate):
     peaks = get_ppg_peaks(data, sample_rate)
 
     return sample_rate*60/np.diff(peaks)
 
+def get_mean_ppg_heartrate(data, period, sample_rate):
+    peaks = get_ppg_peaks(data, sample_rate)
+
+    sample_period = int(period * sample_rate)
+    diff_peaks_mean = []
+    for peak in peaks[sample_period < peaks]:
+        peaks_in_period = peaks[peaks <= peak]
+        peaks_in_period = peaks_in_period[(peak - sample_period) < peaks_in_period]
+        diff_peaks_mean.append(np.mean(np.diff(peaks_in_period)))
+    print(diff_peaks_mean)
+    return sample_rate * 60 / np.array(diff_peaks_mean)
+
 def get_Geshe_blood_pressure(ecg_data, ppg_data, height, sample_rate):
     ecg_peaks = get_ecg_peaks(ecg_data, sample_rate)
     ppg_peaks = get_ppg_peaks(ppg_data, sample_rate)
     ptt = get_ptt(ecg_peaks, ppg_peaks)
+
+    import scipy.ndimage as nd
+
+    kernel_size = 9
+    ptt = nd.median_filter(ptt, kernel_size)
 
     blood_pressure = bp.Gesche(0.5, height, ptt)
 
@@ -63,6 +92,11 @@ def get_MoenAndKorteweg_blood_pressure(ecg_data, ppg_data, height, sample_rate):
     ecg_peaks = get_ecg_peaks(ecg_data, sample_rate)
     ppg_peaks = get_ppg_peaks(ppg_data, sample_rate)
     ptt = get_ptt(ecg_peaks, ppg_peaks)
+
+    import scipy.ndimage as nd
+
+    kernel_size = 9
+    ptt = nd.median_filter(ptt, kernel_size)
 
     blood_pressure = bp.MoenAndKorteweg(height, ptt)
 
